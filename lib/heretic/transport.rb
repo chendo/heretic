@@ -2,14 +2,16 @@ class Heretic
   class Transport
     include LogHelper
 
-    attr_accessor :processor
+    attr_accessor :processor, :input, :output
 
     def initialize(input_io = $stdin, output_io = $stdout)
       @input = input_io
       @output = output_io
+      @message_id = 0
+      @callbacks = {}
     end
 
-    def run
+    def listen
       while !input.eof?
         IO.select([input])
 
@@ -28,21 +30,37 @@ class Heretic
       end
     end
 
-    def send_object(object)
-      # Send the object back
+    def call(object_proxy_id, method, args = [])
       message = {
-        'op' => 'return',
-        'object' => object
+        'op' => 'call',
+        'object_proxy_id' => object_proxy_id,
+        'method_name' => method,
+        'args' => args
       }
       send message
     end
 
-    def send(message)
+    def send_object(object, message_id)
+      # Send the object back
+      message = {
+        'op' => 'return',
+        'object' => object,
+        'id' => message_id
+      }
+      send message
+    end
+
+    def send(message, &block)
+      @message_id += 1
+      message.merge!('id' => @message_id)
       write_to_pipe JSON.generate(message)
+      @processor.add_callback(@message_id, &block)
+      @message_id
     end
 
     def write_to_pipe(data)
       log("Sending: #{data}")
+      IO.select([], [output])
       output.puts data
       output.flush
     end

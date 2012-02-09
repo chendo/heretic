@@ -1,3 +1,4 @@
 require File.dirname(__FILE__) + "/../lib/heretic"
 
-Heretic.start
+$stderr.puts "Starting listener"
+Heretic.listen

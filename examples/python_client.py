@@ -5,10 +5,11 @@ import thread
 import time
 
 
-class RubyBridge:
+class Heretic:
     def __init__(self):
-        self.process = subprocess.Popen(['ruby', '../bin/heretic.rb'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        self.process = subprocess.Popen(['ruby', '../bin/heretic_listener.rb'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         # thread.start_new_thread(self.read_loop, ())
+
 
     def eval(self, code):
         message = {
@@ -68,7 +69,7 @@ class RubyObjectProxy:
         return call_method
 
 
-bridge = RubyBridge()
+bridge = Heretic()
 time = bridge.eval('Time')
 
 print time.now().to_s()
