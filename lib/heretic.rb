@@ -1,5 +1,5 @@
 require "heretic/version"
 
-module Heretic
+class Heretic
   # Your code goes here...
 end

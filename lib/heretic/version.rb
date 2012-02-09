@@ -1,3 +1,3 @@
-module Heretic
+class Heretic
   VERSION = "0.0.1"
 end
