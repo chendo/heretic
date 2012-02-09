@@ -8,8 +8,8 @@ Gem::Specification.new do |s|
   s.authors     = ["Jack Chen (chendo)"]
   s.email       = ["heretic@chen.do"]
   s.homepage    = "http://github.com/chendo/heretic"
-  s.summary     = %q{Heretic is a lightweight, no-frills framework for embedding other language runtimes.}
-  s.description = %q{Heretic is a lightweight, no-frills framework for embedding other language runtimes.}
+  s.summary     = %q{Heretic is a lightweight, no-frills RPC framework.}
+  s.description = %q{Heretic is a lightweight, no-frills RPC framework.}
 
   s.rubyforge_project = "heretic"
 
