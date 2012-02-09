@@ -38,7 +38,7 @@ class RubyBridge:
     def parse_and_handle(self, data):
         message = json.loads(data)
         if message['op'] == 'return':
-            value = message['value']
+            value = message['object']
             if (type(value) is dict) and ('__object_proxy_id' in value):
                 obj = RubyObjectProxy(value, self)
                 return obj
