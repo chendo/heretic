@@ -8,8 +8,8 @@ Gem::Specification.new do |s|
   s.authors     = ["Jack Chen (chendo)"]
   s.email       = ["heretic@chen.do"]
   s.homepage    = "http://github.com/chendo/heretic"
-  s.summary     = %q{Heretic lets you operate with objects in other languages.}
-  s.description = %q{Heretic lets you operate with objects in other languages.}
+  s.summary     = %q{Heretic is a lightweight, no-frills framework for embedding other language runtimes.}
+  s.description = %q{Heretic is a lightweight, no-frills framework for embedding other language runtimes.}
 
   s.rubyforge_project = "heretic"
 
@@ -17,4 +17,6 @@ Gem::Specification.new do |s|
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
+
+  s.add_dependency("json")
 end
