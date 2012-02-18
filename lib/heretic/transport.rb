@@ -9,6 +9,7 @@ class Heretic
       @output = output_io
       @message_id = 0
       @callbacks = {}
+      @mutex = Mutex.new
     end
 
     def listen
@@ -47,22 +48,31 @@ class Heretic
         'object' => object,
         'id' => message_id
       }
-      send message
+      send message, :async => true
     end
 
-    def send(message, &block)
+    def send(message, options = {})
       @message_id += 1
-      message.merge!('id' => @message_id)
-      write_to_pipe JSON.generate(message)
-      @processor.add_callback(@message_id, &block)
-      @message_id
+      message.merge!('id' => @message_id) unless message['id']
+      if !options[:async]
+        r, w = IO.pipe
+        @processor.add_callback(@message_id, w, Thread.current)
+        write_to_pipe JSON.generate(message)
+        r.eof? # Block until other end is closed
+        Thread.current[:__heretic_return_value]
+      else
+        write_to_pipe JSON.generate(message)
+      end
     end
 
     def write_to_pipe(data)
       log("Sending: #{data}")
       IO.select([], [output])
-      output.puts data
-      output.flush
+
+      @mutex.synchronize do
+        output.puts data
+        output.flush
+      end
     end
 
     private

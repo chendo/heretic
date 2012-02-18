@@ -27,10 +27,9 @@ class Heretic
       log(e.backtrace.join("\n"))
     end
 
-    def add_callback(message_id, &block)
-      return unless block_given?
-      log "Adding callback for id #{message_id}: #{block.inspect}"
-      @callbacks[message_id] = block
+    def add_callback(message_id, pipe, thread)
+      log "Adding callback for id #{message_id}: #{thread} from #{caller[1]}"
+      @callbacks[message_id] = [pipe, thread]
     end
 
     def handle_eval(message)
@@ -50,13 +49,18 @@ class Heretic
       log "Handling return: #{message.inspect}"
       ret = message['object']
       if ret.is_a?(Hash) && object_proxy_id = ret['__object_proxy_id']
-        proxy = RemoteObjectProxy.new(object_proxy_id, @transport)
-        log "Creating proxy: #{proxy}"
-        log @callbacks.inspect
-        if block = @callbacks[message['id']]
-          log "Callback found: #{block}"
-          block.call(proxy)
-        end
+        object = RemoteObjectProxy.new(object_proxy_id, @transport)
+        log "Creating proxy: #{object}"
+      else
+        object = message['object']
+      end
+
+      pipe, thread = @callbacks[message['id']]
+      if pipe && thread
+        log "Callback found: #{pipe} #{thread} for #{message['id']}"
+        thread[:__heretic_return_value] = object
+        pipe.close
+        @callbacks.delete(message['id'])
       end
     end
 

@@ -1,10 +1,10 @@
 class Heretic
-  class RemoteObjectProxy
+  class RemoteObjectProxy < BasicObject
     attr_reader :created_at, :object_proxy_id, :transport
 
     def initialize(object_proxy_id, transport)
       @object_proxy_id = object_proxy_id
-      @created_at = Time.now
+      @created_at = ::Time.now
       @transport = transport
     end
 

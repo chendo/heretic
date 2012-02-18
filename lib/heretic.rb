@@ -46,25 +46,23 @@ class Heretic
     @pid = fork do
       STDIN.reopen(stdin_read_end)
       STDOUT.reopen(stdout_write_end)
-      # STDERR.reopen(stder)
       exec(command, *(args.map { |a| a.to_s }))
     end
 
     @transport.input = stdout_read_end
     @transport.output = stdin_write_end
 
-    # stdout, stdin, @pid = PTY.spawn(command, *args)
-
-    # @transport.output = stdin
-    # @transport.input = stdout
-
     log "Connected"
 
     trap_signals
 
-    Thread.start do
-      @transport.listen
+    @thread = Thread.start do
+      listen
     end
+  end
+
+  def join
+    @thread.join
   end
 
   def trap_signals
@@ -81,11 +79,11 @@ class Heretic
     end
   end
 
-  def eval(code, &block)
+  def eval(code)
     @transport.send({
       'op' => 'eval',
       'code' => code
-    }, &block)
+    })
   end
 
 
